@@ -11,6 +11,7 @@ All notable changes to `shinka-evolve` are documented in this file.
 
 ### Fixed
 
+- Fixed bandit sampler resume from legacy or changed `llm_models` state so saved per-arm arrays are resized, name-aligned when possible, and cost-aware UCB range state remains active after loading `bandit_state.pkl` in PR #130, addressing issue #129.
 - Fixed the WebUI embedding similarity heatmap so hydrated programs with empty embeddings no longer leave the tab stuck on `Loading full embedding data...`, and stale cached full-program data is refetched after summary updates.
 
 ## 0.0.5 - 2026-04-22
