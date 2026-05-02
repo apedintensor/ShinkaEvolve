@@ -572,6 +572,32 @@ class AsymmetricUCB(BanditBase):
 
         return cost_ref / cost_denom
 
+    def _restore_cost_range(self, state: Dict[str, Any]) -> None:
+        if (
+            self._state_arm_layout_matches(state, "n_costs")
+            and "min_cost_observed" in state
+            and "max_cost_observed" in state
+        ):
+            self.min_cost_observed = float(state["min_cost_observed"])
+            self.max_cost_observed = float(state["max_cost_observed"])
+            return
+
+        have_cost = self.n_costs > 0.0
+        if not np.any(have_cost):
+            self.min_cost_observed = np.inf
+            self.max_cost_observed = -np.inf
+            return
+
+        mean_costs = self.total_costs[have_cost] / self.n_costs[have_cost]
+        finite_costs = mean_costs[np.isfinite(mean_costs)]
+        if finite_costs.size == 0:
+            self.min_cost_observed = np.inf
+            self.max_cost_observed = -np.inf
+            return
+
+        self.min_cost_observed = float(finite_costs.min())
+        self.max_cost_observed = float(finite_costs.max())
+
     def posterior(self, subset=None, samples=None):
         idx = self._resolve_subset(subset)
         if samples is None or int(samples) <= 1:
@@ -898,6 +924,8 @@ class AsymmetricUCB(BanditBase):
             "obs_min": self._obs_min,
             "n_costs": self.n_costs.copy(),
             "total_costs": self.total_costs.copy(),
+            "min_cost_observed": self.min_cost_observed,
+            "max_cost_observed": self.max_cost_observed,
         }
 
     def set_state(self, state: Dict[str, Any]) -> None:
@@ -916,6 +944,7 @@ class AsymmetricUCB(BanditBase):
         self.total_costs = self._align_state_array(
             state, "total_costs", self.total_costs
         )
+        self._restore_cost_range(state)
 
 
 class FixedSampler(BanditBase):

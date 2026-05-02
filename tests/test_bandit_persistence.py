@@ -315,6 +315,36 @@ def test_fixed_sampler_loads_state_into_fewer_arms():
     _exercise_sampler_after_resize(target)
 
 
+def test_asymmetric_ucb_restores_cost_range_for_cost_aware_resume():
+    source = AsymmetricUCB(
+        arm_names=["cheap", "expensive"],
+        cost_aware_coef=0.5,
+        auto_decay=None,
+        exponential_base=None,
+    )
+    source.update("cheap", reward=1.0, baseline=0.0)
+    source.update("expensive", reward=1.0, baseline=0.0)
+    source.update_cost("cheap", cost=1.0)
+    source.update_cost("expensive", cost=100.0)
+    expected = source.posterior()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        save_path = Path(tmpdir) / "bandit_state.pkl"
+        source.save_state(save_path)
+
+        target = AsymmetricUCB(
+            arm_names=["cheap", "expensive"],
+            cost_aware_coef=0.5,
+            auto_decay=None,
+            exponential_base=None,
+        )
+        target.load_state(save_path)
+
+    assert target.min_cost_observed == source.min_cost_observed
+    assert target.max_cost_observed == source.max_cost_observed
+    assert np.allclose(target.posterior(), expected)
+
+
 def test_named_bandit_state_aligns_when_model_order_changes():
     source = ThompsonSampler(arm_names=["a", "b", "c"], seed=0)
     source.update_submitted("a")
