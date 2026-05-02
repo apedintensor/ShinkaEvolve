@@ -452,6 +452,63 @@ def test_legacy_bandit_state_without_arm_names_uses_prefix_alignment():
     _exercise_sampler_after_resize(target)
 
 
+def test_legacy_thompson_state_without_arm_names_uses_prefix_alignment():
+    source = ThompsonSampler(arm_names=["old-a", "old-b", "old-c"], seed=0)
+    source.update_submitted("old-a")
+    source.update("old-a", reward=0.8, baseline=0.0)
+    source.update_submitted("old-c")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        save_path = Path(tmpdir) / "legacy_thompson_state.pkl"
+        state = _save_state_without_arm_names(source, save_path)
+
+        target = ThompsonSampler(
+            arm_names=["new-a", "new-b", "new-c", "new-d"],
+            seed=1,
+        )
+        target.load_state(save_path)
+
+    assert "arm_names" not in state
+    assert np.allclose(target.n_submitted[:3], source.n_submitted)
+    assert np.allclose(target.n_submitted[3], 0.0)
+    assert np.allclose(target.alpha[:3], source.alpha)
+    assert np.allclose(target.beta[:3], source.beta)
+    assert target.alpha[3] == target.a_prior
+    assert target.beta[3] == target.b_prior
+    _exercise_sampler_after_resize(target)
+
+
+def test_legacy_fixed_state_without_arm_names_uses_prefix_alignment():
+    source = FixedSampler(
+        arm_names=["old-a", "old-b", "old-c"],
+        prior_probs=np.array([0.2, 0.3, 0.5]),
+        seed=0,
+    )
+    source.update("old-a", reward=1.0)
+    source.update_cost("old-c", cost=0.4)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        save_path = Path(tmpdir) / "legacy_fixed_state.pkl"
+        state = _save_state_without_arm_names(source, save_path)
+
+        target = FixedSampler(
+            arm_names=["new-a", "new-b", "new-c", "new-d"],
+            prior_probs=np.array([0.1, 0.2, 0.3, 0.4]),
+            seed=1,
+        )
+        target.load_state(save_path)
+
+    expected_p = np.array([0.2, 0.3, 0.5, 0.4])
+    expected_p = expected_p / expected_p.sum()
+    assert "arm_names" not in state
+    assert np.allclose(target.p, expected_p)
+    assert np.allclose(target.n_pulls[:3], source.n_pulls)
+    assert np.allclose(target.n_pulls[3], 0.0)
+    assert np.allclose(target.n_costs[:3], source.n_costs)
+    assert np.allclose(target.total_costs[:3], source.total_costs)
+    _exercise_sampler_after_resize(target)
+
+
 def test_asymmetric_ucb_recomputes_observation_range_when_dropping_arms():
     source = AsymmetricUCB(
         arm_names=["a", "b", "c", "d"],
