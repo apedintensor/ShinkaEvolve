@@ -58,6 +58,24 @@ harness in Python.
 
 ---
 
+## Fortran Heat Diffusion
+
+| | |
+|-|-|
+| **Path** | [`examples/fortran_heat_diffusion`](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/fortran_heat_diffusion) |
+| **Language** | Fortran candidate + Python evaluator |
+| **Focus** | Compiled numerical stencil evolution |
+
+```bash
+cd examples/fortran_heat_diffusion
+python evaluate.py --program_path initial.f90 --results_dir results/manual_eval
+```
+
+Use this when candidates should be compiled with `gfortran` before
+floating-point correctness and runtime scoring.
+
+---
+
 ## Novelty Generator
 
 | | |
@@ -84,5 +102,6 @@ before moving into full CLI or API workflows.
 |------|---------|
 | Best default choice | Circle Packing |
 | Cross-language evolution | Julia Prime Counting |
+| Compiled numerical stencil | Fortran Heat Diffusion |
 | Game / control optimization | Game 2048 |
 | Creative / open-ended | Novelty Generator |
