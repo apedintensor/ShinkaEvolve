@@ -89,6 +89,10 @@ class DatabaseRequestHandler(http.server.SimpleHTTPRequestHandler):
             "cc": "cpp",
             "cxx": "cpp",
             "cu": "cuda",
+            "f90": "fortran",
+            "f95": "fortran",
+            "f03": "fortran",
+            "f08": "fortran",
         }.get(ext, ext or "python")
 
     def _resolve_failed_node_language(
@@ -141,6 +145,7 @@ class DatabaseRequestHandler(http.server.SimpleHTTPRequestHandler):
             "typescript": ".ts",
             "cpp": ".cpp",
             "cuda": ".cu",
+            "fortran": ".f90",
         }.get(language)
         if preferred_suffix:
             preferred_path = failure_path.parent / f"main{preferred_suffix}"

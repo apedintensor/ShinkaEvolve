@@ -3114,6 +3114,10 @@ class ShinkaEvolveRunner:
             "cc": "cpp",
             "cxx": "cpp",
             "cu": "cuda",
+            "f90": "fortran",
+            "f95": "fortran",
+            "f03": "fortran",
+            "f08": "fortran",
         }.get(ext, ext or "python")
 
     async def _write_failure_artifact_async(

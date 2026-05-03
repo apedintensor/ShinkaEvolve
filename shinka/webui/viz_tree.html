@@ -2262,7 +2262,8 @@
                                         'python': 'py',
                                         'cpp': 'cpp',
                                         'javascript': 'js',
-                                        'cuda': 'cu'
+                                        'cuda': 'cu',
+                                        'fortran': 'f90'
                                     }[language] || language;
 
                                     a.download = `${agentName}_gen${gen}.${extension}`;
@@ -12897,7 +12898,8 @@ console.error("[DEBUG] Error in processData:", error);
                     'python': 'py',
                     'cpp': 'cpp',
                     'javascript': 'js',
-                    'cuda': 'cu'
+                    'cuda': 'cu',
+                    'fortran': 'f90'
                 }[language] || language;
                 
                 // Determine comment style based on language
@@ -12909,7 +12911,12 @@ console.error("[DEBUG] Error in processData:", error);
                     'javascript': '//',
                     'js': '//',
                     'cuda': '//',
-                    'cu': '//'
+                    'cu': '//',
+                    'fortran': '!',
+                    'f90': '!',
+                    'f95': '!',
+                    'f03': '!',
+                    'f08': '!'
                 }[language.toLowerCase()] || '//';
                 
                 const filename = `${rank}_gen${gen}_${name.replace(/[^a-zA-Z0-9_-]/g, '_')}.${extension}`;

@@ -157,6 +157,35 @@ def test_validate_code_async_python_delegates_to_helper(
     assert recorded["timeout"] == 11
 
 
+def test_validate_code_async_fortran_delegates_to_gfortran(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    recorded: dict[str, object] = {}
+
+    async def fake_helper(*args: str, timeout: int) -> tuple[bool, str | None]:
+        recorded["args"] = args
+        recorded["timeout"] = timeout
+        return True, None
+
+    monkeypatch.setattr(async_apply, "_run_validation_subprocess", fake_helper)
+
+    is_valid, error = asyncio.run(
+        async_apply.validate_code_async(
+            str(tmp_path / "candidate.f90"), language="f95", timeout=17
+        )
+    )
+
+    assert is_valid is True
+    assert error is None
+    assert recorded["args"] == (
+        "gfortran",
+        "-fsyntax-only",
+        str(tmp_path / "candidate.f90"),
+    )
+    assert recorded["timeout"] == 17
+
+
 def test_validate_code_async_json_delegates_to_helper(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

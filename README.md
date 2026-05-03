@@ -101,6 +101,7 @@ For detailed installation instructions and usage examples, see the [Getting Star
 | ⭕ [Circle Packing](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/circle_packing) | Optimize circle packing to maximize radii. | `LocalJobConfig` |
 | 🎮 [Game 2048](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/game_2048) | Optimize a policy for the Game of 2048. | `LocalJobConfig` |
 | ∑ [Julia Prime Counting](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/julia_prime_counting) | Optimize a Julia solver for prime-count queries. | `LocalJobConfig` |
+| 🔥 [Fortran Heat Diffusion](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/fortran_heat_diffusion) | Optimize a compiled Fortran stencil solver. | `LocalJobConfig` |
 | ✨ [Novelty Generator](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/novelty_generator) | Generate creative, surprising outputs (e.g., ASCII art). | `LocalJobConfig` |
 
 
