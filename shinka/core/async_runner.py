@@ -187,6 +187,13 @@ def _dedupe_model_names(model_names: Iterable[str]) -> list[str]:
     return deduped
 
 
+def _llm_kwargs_with_headless_work_dir(
+    llm_kwargs: Dict[str, Any],
+    results_dir: Path,
+) -> Dict[str, Any]:
+    return {"headless_work_dir": str(results_dir), **llm_kwargs}
+
+
 def _validate_evo_config_model_env_access(evo_config: EvolutionConfig) -> None:
     llm_models = list(evo_config.llm_models)
 
@@ -383,7 +390,10 @@ class ShinkaEvolveRunner:
         # LLM clients
         self.llm = AsyncLLMClient(
             model_names=evo_config.llm_models,
-            **evo_config.llm_kwargs,
+            **_llm_kwargs_with_headless_work_dir(
+                evo_config.llm_kwargs,
+                Path(self.results_dir),
+            ),
         )
 
         # Embedding client (use async version for async runner)
@@ -414,7 +424,10 @@ class ShinkaEvolveRunner:
             # Create async LLM client for meta analysis
             async_meta_llm = AsyncLLMClient(
                 model_names=evo_config.meta_llm_models or evo_config.llm_models,
-                **evo_config.meta_llm_kwargs,
+                **_llm_kwargs_with_headless_work_dir(
+                    evo_config.meta_llm_kwargs,
+                    Path(self.results_dir),
+                ),
             )
             # Create sync summarizer for state management
             sync_meta_summarizer = MetaSummarizer(
@@ -436,7 +449,10 @@ class ShinkaEvolveRunner:
         if evo_config.novelty_llm_models:
             novelty_llm = AsyncLLMClient(
                 model_names=evo_config.novelty_llm_models,
-                **evo_config.novelty_llm_kwargs,
+                **_llm_kwargs_with_headless_work_dir(
+                    evo_config.novelty_llm_kwargs,
+                    Path(self.results_dir),
+                ),
             )
             sync_novelty_judge = NoveltyJudge(
                 novelty_llm_client=None,  # We'll use async version
@@ -468,7 +484,10 @@ class ShinkaEvolveRunner:
             prompt_llm_models = evo_config.prompt_llm_models or evo_config.llm_models
             self.prompt_llm = AsyncLLMClient(
                 model_names=prompt_llm_models,
-                **evo_config.prompt_llm_kwargs,
+                **_llm_kwargs_with_headless_work_dir(
+                    evo_config.prompt_llm_kwargs,
+                    Path(self.results_dir),
+                ),
             )
             logger.info(f"Prompt evolution enabled with models: {prompt_llm_models}")
         else:
@@ -2992,6 +3011,17 @@ class ShinkaEvolveRunner:
             response_file = attempt_dir / "llm_response.txt"
             await write_file_async(str(response_file), response.content)
 
+        response_kwargs = getattr(response, "kwargs", {}) if response else {}
+        headless_prompt_path = response_kwargs.get("headless_prompt_path")
+        if headless_prompt_path:
+            prompt_source = Path(headless_prompt_path)
+            if prompt_source.exists():
+                prompt_file = attempt_dir / "headless_prompt.md"
+                await write_file_async(
+                    str(prompt_file),
+                    prompt_source.read_text(encoding="utf-8"),
+                )
+
         # Save patch text if available
         if patch_text:
             patch_file = attempt_dir / "patch.txt"
@@ -3013,7 +3043,11 @@ class ShinkaEvolveRunner:
 
         if response:
             metadata["llm_cost"] = response.cost
-            metadata["llm_model"] = getattr(response, "model", None)
+            metadata["llm_model"] = getattr(response, "model_name", None)
+            if headless_prompt_path:
+                metadata["headless_prompt_path"] = str(
+                    attempt_dir / "headless_prompt.md"
+                )
 
         metadata_file = attempt_dir / "metadata.json"
         await write_file_async(str(metadata_file), json.dumps(metadata, indent=2))

@@ -6,6 +6,8 @@ All notable changes to `shinka-evolve` are documented in this file.
 
 ### Added
 
+- Added Headless CLI-backed LLM provider support via `headless/<agent>` model strings, defaulting to `npx -y @roberttlange/headless` for subscription-backed Codex, Claude, and other local agent calls.
+- Added Headless startup validation, prompt artifacts, usage/cost parsing, and a `examples/sine_approx_headless` task showing API-free mutation calls with embeddings disabled.
 - Added Vertex AI authentication support for Gemini LLM and embedding clients in PR #125. Thanks @wu375.
 - Added async-runner validation for configured LLM and embedding model environment access before run artifacts are created in PR #127. Thanks @RobertTLange.
 - Added GPT-5.5 and GPT-5.5 Pro entries to the OpenAI LLM pricing catalog.
