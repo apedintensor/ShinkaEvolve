@@ -2,7 +2,7 @@
 
 All notable changes to `shinka-evolve` are documented in this file.
 
-## 0.0.6 - TBD
+## 0.0.6 - 2026-05-03
 
 ### Added
 
