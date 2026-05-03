@@ -110,6 +110,7 @@ def _run_program(
             capture_output=True,
             text=True,
             timeout=TIMEOUT_SECONDS,
+            cwd=tmpdir_path,
         )
         elapsed = time.perf_counter() - start
 
