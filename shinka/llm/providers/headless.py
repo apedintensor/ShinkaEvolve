@@ -363,8 +363,13 @@ def _query_result(
         {"role": "user", "content": msg},
         {"role": "assistant", "content": content},
     ]
+    nested_cost = usage.get("cost") if isinstance(usage.get("cost"), dict) else {}
     input_cost = _usage_float(usage, "input_cost", "prompt_cost")
+    if input_cost == 0.0:
+        input_cost = _usage_float(nested_cost, "input", "prompt")
     output_cost = _usage_float(usage, "output_cost", "completion_cost")
+    if output_cost == 0.0:
+        output_cost = _usage_float(nested_cost, "output", "completion")
     cost = _usage_float(usage, "cost", "total_cost")
     if cost == 0.0:
         cost = input_cost + output_cost

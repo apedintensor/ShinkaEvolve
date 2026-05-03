@@ -230,6 +230,8 @@ def test_query_headless_accepts_nested_cost_usage(tmp_path, monkeypatch):
     )
 
     assert result.cost == pytest.approx(0.03)
+    assert result.input_cost == pytest.approx(0.01)
+    assert result.output_cost == pytest.approx(0.02)
     assert result.input_tokens == 1
     assert result.output_tokens == 2
     assert result.thinking_tokens == 3
