@@ -9,6 +9,7 @@ from typing import Tuple, Optional
 from pathlib import Path
 from .apply_diff import apply_diff_patch
 from .apply_full import apply_full_patch
+from shinka.utils.languages import normalize_language
 
 try:
     import aiofiles
@@ -117,6 +118,10 @@ async def validate_code_async(
         Tuple of (is_valid, error_message)
     """
     try:
+        try:
+            language = normalize_language(language)
+        except ValueError:
+            language = language.strip().lower()
         if language == "python":
             # Use python -m py_compile for syntax checking
             return await _run_validation_subprocess(
@@ -154,6 +159,14 @@ async def validate_code_async(
             # Use g++ for C++ compilation check
             return await _run_validation_subprocess(
                 "g++",
+                "-fsyntax-only",
+                code_path,
+                timeout=timeout,
+            )
+        elif language == "fortran":
+            # Use gfortran for Fortran syntax checking
+            return await _run_validation_subprocess(
+                "gfortran",
                 "-fsyntax-only",
                 code_path,
                 timeout=timeout,
