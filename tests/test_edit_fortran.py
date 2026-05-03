@@ -15,13 +15,15 @@ integer function score(x)
 end function score
 ! EVOLVE-BLOCK-END"""
 
-    patch_content = """! EVOLVE-BLOCK-START
-<<<<<<< SEARCH
-score = x + 1
-=======
-score = x + 2
->>>>>>> REPLACE
-! EVOLVE-BLOCK-END"""
+    patch_content = (
+        "! EVOLVE-BLOCK-START\n"
+        "<<<<<<< SEARCH\n"
+        "score = x + 1\n"
+        "=======\n"
+        "score = x + 2\n"
+        ">>>>>>> REPLACE\n"
+        "! EVOLVE-BLOCK-END"
+    )
 
     patch_dir = tmp_path / "fortran_diff_patch"
     result = apply_diff_patch(
