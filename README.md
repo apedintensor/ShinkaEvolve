@@ -18,7 +18,7 @@
 
 ---
 
-**May 2026 Update**: Added Headless CLI-backed mutation models for subscription-backed agent usage. Use model strings such as `headless/codex@gpt-5.5?effort=high` or `headless/claude` with `shinka_run`; Shinka invokes `npx -y @roberttlange/headless` by default, validates `headless --check` at startup, and can run without embedding API keys by setting `evo.embedding_model=null`.
+**May 2026 Update**: Added [Headless](https://github.com/RobertTLange/headless-cli) CLI-backed mutation models for subscription-backed agent usage. Use model strings such as `headless/codex@gpt-5.5?effort=high` or `headless/claude`. Check the [example](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/sine_approx_headless) for more detail.
 
 **Apr 2026 Update**: Added the new [documentation website](https://sakanaai.github.io/ShinkaEvolve/) with guides for getting started, configuration, async evolution, local models, WebUI usage, and agentic workflows.
 
