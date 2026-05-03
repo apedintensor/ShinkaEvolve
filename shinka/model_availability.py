@@ -14,6 +14,7 @@ from shinka.embed.providers.pricing import (
 from shinka.google_genai import google_genai_auth_mode
 from shinka.llm.providers.model_resolver import resolve_model_backend
 from shinka.llm.providers.pricing import get_all_providers, get_models_by_provider
+from shinka.llm.providers.headless import check_headless_available
 
 
 PROVIDER_ENV_REQUIREMENTS: dict[str, tuple[str, ...]] = {
@@ -150,6 +151,22 @@ def validate_model_env_access(
     llm_models: Iterable[str] = (),
     embedding_models: Iterable[str] = (),
 ) -> None:
+    llm_models = list(llm_models)
+    embedding_models = list(embedding_models)
+    headless_models = [
+        model_name
+        for model_name in llm_models
+        if resolve_model_backend(model_name).provider == "headless"
+    ]
+    if headless_models:
+        try:
+            check_headless_available()
+        except ValueError as exc:
+            models = ", ".join(headless_models)
+            raise ValueError(
+                f"Requested headless model(s) are unavailable: {models}. {exc}"
+            ) from exc
+
     issues = find_model_env_access_issues(
         llm_models=llm_models,
         embedding_models=embedding_models,

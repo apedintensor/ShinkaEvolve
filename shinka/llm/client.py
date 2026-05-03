@@ -19,6 +19,8 @@ def _build_azure_endpoint() -> str:
     if not endpoint.endswith("/"):
         endpoint += "/"
     return endpoint + "openai/v1/"
+
+
 def get_client_llm(
     model_name: str, structured_output: bool = False
 ) -> Tuple[Any, str, str]:
@@ -97,6 +99,8 @@ def get_client_llm(
             base_url=resolved.base_url,
             timeout=TIMEOUT,
         )
+    elif provider == "headless":
+        client = None
     else:
         raise ValueError(f"Model {model_name} not supported.")
 
@@ -177,6 +181,8 @@ def get_async_client_llm(
             base_url=resolved.base_url,
             timeout=TIMEOUT,
         )
+    elif provider == "headless":
+        client = None
     else:
         raise ValueError(f"Model {model_name} not supported.")
 
